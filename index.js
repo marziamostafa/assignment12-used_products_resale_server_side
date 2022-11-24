@@ -23,6 +23,7 @@ async function run() {
         const categoryCollection = client.db('bookworms').collection('categories')
         const booksCollection = client.db('bookworms').collection('allbook')
         const bookingCollection = client.db('bookworms').collection('allbookings')
+        const usersCollection = client.db('bookworms').collection('users')
 
         app.get('/categories', async (req, res) => {
             const query = {}
@@ -57,12 +58,16 @@ async function run() {
 
         app.post('/allbookings', async (req, res) => {
             const booking = req.body
-            const result = await bookingCollection.insertOne(allbookings)
+            const result = await bookingCollection.insertOne(booking)
             res.send(result)
         })
 
-
-
+        //getting all users
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user)
+            res.send(result);
+        })
 
     }
     finally {
