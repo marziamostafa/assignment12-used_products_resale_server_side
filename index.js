@@ -2,7 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const port = process.env.PORT || 5000
 const app = express()
-// const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
@@ -46,6 +46,7 @@ async function run() {
         //-------------------------booked products-----------------------
         app.get('/allbookings', async (req, res) => {
             const email = req.query.email
+            // console.log(email)
             // const decodedEmail = req.decoded.email
             // if(email !== decodedEmail){
             //     return res.status(403).send({message: 'forbidden access'})
@@ -62,11 +63,37 @@ async function run() {
             res.send(result)
         })
 
+        //jwt token
+        app.get('/jwt', async (req, res) => {
+            const email = req.query.email;
+
+            const query = { email: email };
+            const user = await usersCollection.findOne(query);
+
+            if (user) {
+                const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, { expiresIn: '10d' })
+                return res.send({ accessToken: token });
+            }
+
+            res.status(403).send({ accessToken: '' })
+
+        })
+
         //getting all users
+        // app.get('/users', async (req, res) => {
+        //     const query = {};
+        //     const users = await usersCollection.find(query).toArray();
+        //     res.send(users);
+        // });
+
+
+        //adding all users
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user)
+            console.log(result)
             res.send(result);
+
         })
 
     }
