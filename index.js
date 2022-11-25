@@ -17,6 +17,25 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
+function verifyJWT(req, res, next) {
+
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return res.status(401).send('unauthorized access');
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({ message: 'forbidden access' })
+        }
+        req.decoded = decoded;
+        next();
+    })
+
+}
 
 async function run() {
     try {
@@ -44,13 +63,16 @@ async function run() {
         })
 
         //-------------------------booked products-----------------------
-        app.get('/allbookings', async (req, res) => {
+        app.get('/allbookings', verifyJWT, async (req, res) => {
             const email = req.query.email
             // console.log(email)
-            // const decodedEmail = req.decoded.email
-            // if(email !== decodedEmail){
-            //     return res.status(403).send({message: 'forbidden access'})
-            // }
+            const decodedEmail = req.decoded.email
+
+
+            if (email !== decodedEmail) {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
+
             const query = { email: email };
             // console.log(req.headers.authorization)
             const result = await bookingCollection.find(query).toArray()
@@ -80,11 +102,11 @@ async function run() {
         })
 
         //getting all users
-        // app.get('/users', async (req, res) => {
-        //     const query = {};
-        //     const users = await usersCollection.find(query).toArray();
-        //     res.send(users);
-        // });
+        app.get('/users', async (req, res) => {
+            const query = {};
+            const users = await usersCollection.find(query).toArray();
+            res.send(users);
+        });
 
 
         //adding all users
@@ -94,6 +116,15 @@ async function run() {
             console.log(result)
             res.send(result);
 
+        })
+
+        //get sellers
+        app.get('/users/allsellers', async (req, res) => {
+
+            const query = {};
+            const users = await usersCollection.find(query).toArray();
+            const sellers = users.filter(user => user.role === 'seller')
+            res.send(sellers);
         })
 
     }
