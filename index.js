@@ -118,13 +118,30 @@ async function run() {
 
         })
 
-        //get sellers
+        //get only sellers
         app.get('/users/allsellers', async (req, res) => {
 
             const query = {};
             const users = await usersCollection.find(query).toArray();
             const sellers = users.filter(user => user.role === 'seller')
             res.send(sellers);
+        })
+
+        //get only buyers
+        app.get('/users/allbuyers', async (req, res) => {
+
+            const query = {};
+            const users = await usersCollection.find(query).toArray();
+            const buyers = users.filter(user => user.role === 'buyer')
+            res.send(buyers);
+        })
+
+
+        app.post('/items', async (req, res) => {
+            const item = req.body
+            console.log(item)
+            const result = await itemsCollection.insertOne(item)
+            res.send(result)
         })
 
     }
