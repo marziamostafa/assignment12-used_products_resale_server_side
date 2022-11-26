@@ -62,6 +62,15 @@ async function run() {
             res.send(result);
         })
 
+
+        app.post('/allbook', async (req, res) => {
+            const item = req.body
+            console.log(item)
+            const result = await booksCollection.insertOne(item)
+            res.send(result)
+        })
+
+
         //-------------------------booked products-----------------------
         app.get('/allbookings', verifyJWT, async (req, res) => {
             const email = req.query.email
@@ -108,6 +117,13 @@ async function run() {
             res.send(users);
         });
 
+        app.get('/users/:email', async (req, res) => {
+            const id = req.params.email;
+            const query = { email: id };
+            const users = await usersCollection.findOne(query);
+            res.send(users);
+        });
+
 
         //adding all users
         app.post('/users', async (req, res) => {
@@ -123,6 +139,7 @@ async function run() {
 
             const query = {};
             const users = await usersCollection.find(query).toArray();
+
             const sellers = users.filter(user => user.role === 'seller')
             res.send(sellers);
         })
@@ -137,12 +154,37 @@ async function run() {
         })
 
 
-        app.post('/items', async (req, res) => {
-            const item = req.body
-            console.log(item)
-            const result = await itemsCollection.insertOne(item)
+        app.get('/dashBoard/allbook', async (req, res) => {
+            const email = req.query.email
+            // const decodedEmail = req.decoded.email
+            // if(email !== decodedEmail){
+            //     return res.status(403).send({message: 'forbidden access'})
+            // }
+            const query = { email: email };
+            // console.log(req.headers.authorization)
+            const result = await booksCollection.find(query).toArray()
             res.send(result)
         })
+
+        //for my addedproduct
+        app.get('/dashboard/allbook/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log()
+            const query = { _id: ObjectId(id) };
+            const result = await booksCollection.findOne(query);
+            res.send(result)
+
+        })
+
+        app.delete('/dashboard/allbook/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await booksCollection.deleteOne(query);
+            res.send(result)
+        })
+
+
+
 
     }
     finally {
