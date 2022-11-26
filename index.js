@@ -94,6 +94,15 @@ async function run() {
             res.send(result)
         })
 
+        //for payment
+
+        app.get('/allbookings/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            const booking = await bookingCollection.findOne(query)
+            res.send(booking)
+        })
+
         //jwt token
         app.get('/jwt', async (req, res) => {
             const email = req.query.email;
@@ -109,6 +118,9 @@ async function run() {
             res.status(403).send({ accessToken: '' })
 
         })
+
+
+
 
         //getting all users
         // app.get('/users', async (req, res) => {
