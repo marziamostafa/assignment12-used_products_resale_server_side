@@ -52,9 +52,20 @@ async function run() {
             const query = {}
             const result = await categoryCollection.find(query).toArray()
             res.send(result)
+
         })
+
+
         //-----------------allbook data -----------------------
-        app.get('/allbook', async (req, res) => {
+        app.get('/allbook', verifyJWT, async (req, res) => {
+
+            const decodedEmail = req.decoded.email
+
+
+            if (email !== decodedEmail) {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
+
             const query = {}
             const result = await booksCollection.find(query).toArray()
             res.send(result)
@@ -94,6 +105,13 @@ async function run() {
 
         app.post('/allbookings', async (req, res) => {
             const booking = req.body
+            const query = { productName: booking.productName }
+            const alreadyBooked = await bookingCollection.find(query).toArray()
+            console.log(alreadyBooked)
+            if (alreadyBooked.length) {
+                const message = `This product is already booked`
+                return res.send({ acknowledged: false, message })
+            }
             const result = await bookingCollection.insertOne(booking)
             res.send(result)
         })
@@ -243,7 +261,7 @@ async function run() {
 
 
         //get only buyers
-        app.get('/dashboard/allbuyers', async (req, res) => {
+        app.get('/dashboard/allbuyers', verifyJWT, async (req, res) => {
 
             const query = {};
             const users = await usersCollection.find(query).toArray();
