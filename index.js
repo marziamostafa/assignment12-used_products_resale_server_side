@@ -111,19 +111,40 @@ async function run() {
         })
 
         //getting all users
+        // app.get('/users', async (req, res) => {
+        //     const query = {};
+        //     const users = await usersCollection.find(query).toArray();
+        //     res.send(users);
+        // });
+
+
+
+        // app.get('/users/:email', async (req, res) => {
+        //     const id = req.params.email;
+        //     // const decodedEmail = req.decoded.email
+        //     // if(email !== decodedEmail){
+        //     //     return res.status(403).send({message: 'forbidden access'})
+        //     // }
+
+        //     // console.log(req.headers.authorization)
+        //     const query = { email: id };
+        //     const users = await usersCollection.findOne(query);
+        //     res.send(users);
+        // });
+
+
         app.get('/users', async (req, res) => {
-            const query = {};
-            const users = await usersCollection.find(query).toArray();
-            res.send(users);
-        });
+            const email = req.query.email
+            // const decodedEmail = req.decoded.email
+            // if(email !== decodedEmail){
+            //     return res.status(403).send({message: 'forbidden access'})
+            // }
+            const query = { email: email };
+            // console.log(req.headers.authorization)
+            const result = await usersCollection.find(query).toArray()
+            res.send(result)
 
-        app.get('/users/:email', async (req, res) => {
-            const id = req.params.email;
-            const query = { email: id };
-            const users = await usersCollection.findOne(query);
-            res.send(users);
-        });
-
+        })
 
         //adding all users
         app.post('/users', async (req, res) => {
@@ -135,7 +156,7 @@ async function run() {
         })
 
         //get only sellers
-        app.get('/users/allsellers', async (req, res) => {
+        app.get('/dashboard/allsellers', async (req, res) => {
 
             const query = {};
             const users = await usersCollection.find(query).toArray();
@@ -144,13 +165,53 @@ async function run() {
             res.send(sellers);
         })
 
+
+
+        //deleting sellers
+        app.get('/users/allsellers/:id', async (req, res) => {
+
+            const id = req.params.id;
+            console.log()
+            const query = { _id: ObjectId(id) };
+            const result = await usersCollection.findOne(query);
+            res.send(result)
+
+        })
+
+        app.delete('/users/allsellers/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await usersCollection.deleteOne(query);
+            res.send(result)
+        })
+
+
+
         //get only buyers
-        app.get('/users/allbuyers', async (req, res) => {
+        app.get('/dashboard/allbuyers', async (req, res) => {
 
             const query = {};
             const users = await usersCollection.find(query).toArray();
             const buyers = users.filter(user => user.role === 'buyer')
             res.send(buyers);
+        })
+
+        //deleting buyers
+        app.get('/users/allbuyers/:id', async (req, res) => {
+
+            const id = req.params.id;
+            console.log()
+            const query = { _id: ObjectId(id) };
+            const result = await usersCollection.findOne(query);
+            res.send(result)
+
+        })
+
+        app.delete('/users/allbuyers/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await usersCollection.deleteOne(query);
+            res.send(result)
         })
 
 
