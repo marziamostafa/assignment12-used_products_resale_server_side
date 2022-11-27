@@ -47,6 +47,10 @@ async function run() {
         const bookingCollection = client.db('bookworms').collection('allbookings')
         const usersCollection = client.db('bookworms').collection('users')
         const paymentsCollection = client.db('bookworms').collection('payments')
+        const addCollection = client.db('bookworms').collection('adds')
+        const reportCollection = client.db('bookworms').collection('reports')
+
+
 
         app.get('/categories', async (req, res) => {
             const query = {}
@@ -56,7 +60,7 @@ async function run() {
         })
 
 
-        //-----------------allbook data -----------------------
+        //-----------------all books data -----------------------
         app.get('/allbook', verifyJWT, async (req, res) => {
 
             const decodedEmail = req.decoded.email
@@ -75,6 +79,9 @@ async function run() {
             const query = { category_id: id };
             const result = await booksCollection.find(query).toArray();
             res.send(result);
+
+            const name = req.query.name
+            console.log(name)
         })
 
 
@@ -87,15 +94,22 @@ async function run() {
 
 
         //-------------------------booked products-----------------------
-        app.get('/allbookings', verifyJWT, async (req, res) => {
+        // app.get('/newbookings', async (req, res) => {
+        //     const query = {}
+        //     const result = await bookingCollection.find(query).toArray()
+        //     res.send(result)
+        // })
+
+
+        app.get('/allbookings', async (req, res) => {
             const email = req.query.email
             // console.log(email)
-            const decodedEmail = req.decoded.email
+            // const decodedEmail = req.decoded.email
 
 
-            if (email !== decodedEmail) {
-                return res.status(403).send({ message: 'forbidden access' })
-            }
+            // if (email !== decodedEmail) {
+            //     return res.status(403).send({ message: 'forbidden access' })
+            // }
 
             const query = { email: email };
             // console.log(req.headers.authorization)
@@ -105,6 +119,7 @@ async function run() {
 
         app.post('/allbookings', async (req, res) => {
             const booking = req.body
+
             const query = { productName: booking.productName }
             const alreadyBooked = await bookingCollection.find(query).toArray()
             console.log(alreadyBooked)
@@ -112,7 +127,10 @@ async function run() {
                 const message = `This product is already booked`
                 return res.send({ acknowledged: false, message })
             }
+
+
             const result = await bookingCollection.insertOne(booking)
+
             res.send(result)
         })
 
@@ -261,7 +279,7 @@ async function run() {
 
 
         //get only buyers
-        app.get('/dashboard/allbuyers', verifyJWT, async (req, res) => {
+        app.get('/dashboard/allbuyers', async (req, res) => {
 
             const query = {};
             const users = await usersCollection.find(query).toArray();
@@ -318,8 +336,39 @@ async function run() {
         })
 
 
+        //make advertise
+        app.get('/makeadd', async (req, res) => {
+            const query = {};
+            const result = await addCollection.find(query).toArray()
+            res.send(result);
+        })
+
+        app.post('/makeadd', async (req, res) => {
+            const user = req.body;
+            const result = await addCollection.insertOne(user)
+            res.send(result);
+        })
 
 
+
+        app.get('/report', async (req, res) => {
+            const query = {};
+            const result = await reportCollection.find(query).toArray()
+            res.send(result);
+        })
+        app.post('/report', async (req, res) => {
+            const user = req.body;
+            const result = await reportCollection.insertOne(user)
+            res.send(result);
+        })
+        app.delete('/dashboard/report/:id', async (req, res) => {
+
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await reportCollection.deleteOne(query);
+            res.send(result)
+            console.log(id)
+        })
     }
     finally {
 
