@@ -61,27 +61,26 @@ async function run() {
 
 
         //-----------------all books data -----------------------
-        app.get('/allbook', verifyJWT, async (req, res) => {
+        app.get('/allbook', async (req, res) => {
 
-            const decodedEmail = req.decoded.email
+            // const decodedEmail = req.decoded.email
 
 
-            if (email !== decodedEmail) {
-                return res.status(403).send({ message: 'forbidden access' })
-            }
+            // if (email !== decodedEmail) {
+            //     return res.status(403).send({ message: 'forbidden access' })
+            // }
 
             const query = {}
             const result = await booksCollection.find(query).toArray()
             res.send(result)
         })
+
         app.get('/allbook/:id', async (req, res) => {
             const id = req.params.id;
             const query = { category_id: id };
             const result = await booksCollection.find(query).toArray();
             res.send(result);
 
-            const name = req.query.name
-            console.log(name)
         })
 
 
@@ -94,11 +93,11 @@ async function run() {
 
 
         //-------------------------booked products-----------------------
-        // app.get('/newbookings', async (req, res) => {
-        //     const query = {}
-        //     const result = await bookingCollection.find(query).toArray()
-        //     res.send(result)
-        // })
+        app.get('/newbookings', async (req, res) => {
+            const query = {}
+            const result = await bookingCollection.find(query).toArray()
+            res.send(result)
+        })
 
 
         app.get('/allbookings', async (req, res) => {
@@ -369,6 +368,38 @@ async function run() {
             res.send(result)
             console.log(id)
         })
+
+        //verifying user
+        app.put('/users/verify/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    status: 'verified'
+                }
+            }
+            const result = await usersCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        });
+
+        //deleting add
+
+        app.delete('/makeadd/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await addCollection.deleteOne(query);
+            res.send(result)
+        })
+        app.get('/makeadd/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await addCollection.findOne(query);
+            res.send(result)
+        })
+
+
+
     }
     finally {
 
