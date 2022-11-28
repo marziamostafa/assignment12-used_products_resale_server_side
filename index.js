@@ -61,14 +61,14 @@ async function run() {
 
 
         //-----------------all books data -----------------------
-        app.get('/allbook', async (req, res) => {
+        app.get('/allbook', verifyJWT, async (req, res) => {
 
-            // const decodedEmail = req.decoded.email
+            const decodedEmail = req.decoded.email
 
 
-            // if (email !== decodedEmail) {
-            //     return res.status(403).send({ message: 'forbidden access' })
-            // }
+            if (email !== decodedEmail) {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
 
             const query = {}
             const result = await booksCollection.find(query).toArray()
@@ -100,15 +100,15 @@ async function run() {
         })
 
 
-        app.get('/allbookings', async (req, res) => {
+        app.get('/allbookings', verifyJWT, async (req, res) => {
             const email = req.query.email
             // console.log(email)
-            // const decodedEmail = req.decoded.email
+            const decodedEmail = req.decoded.email
 
 
-            // if (email !== decodedEmail) {
-            //     return res.status(403).send({ message: 'forbidden access' })
-            // }
+            if (email !== decodedEmail) {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
 
             const query = { email: email };
             // console.log(req.headers.authorization)
@@ -175,7 +175,7 @@ async function run() {
             res.send(result);
         })
 
-        app.get('/payments', async (req, res) => {
+        app.get('/payments', verifyJWT, async (req, res) => {
             const query = {};
             const result = await bookingCollection.find(query).toArray()
             res.send(result)
@@ -199,36 +199,12 @@ async function run() {
 
 
 
-
-        //getting all users
-        // app.get('/users', async (req, res) => {
-        //     const query = {};
-        //     const users = await usersCollection.find(query).toArray();
-        //     res.send(users);
-        // });
-
-
-
-        // app.get('/users/:email', async (req, res) => {
-        //     const id = req.params.email;
-        //     // const decodedEmail = req.decoded.email
-        //     // if(email !== decodedEmail){
-        //     //     return res.status(403).send({message: 'forbidden access'})
-        //     // }
-
-        //     // console.log(req.headers.authorization)
-        //     const query = { email: id };
-        //     const users = await usersCollection.findOne(query);
-        //     res.send(users);
-        // });
-
-
-        app.get('/users', async (req, res) => {
+        app.get('/users', verifyJWT, async (req, res) => {
             const email = req.query.email
-            // const decodedEmail = req.decoded.email
-            // if(email !== decodedEmail){
-            //     return res.status(403).send({message: 'forbidden access'})
-            // }
+            const decodedEmail = req.decoded.email
+            if (email !== decodedEmail) {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
             const query = { email: email };
             // console.log(req.headers.authorization)
             const result = await usersCollection.find(query).toArray()
@@ -278,7 +254,7 @@ async function run() {
 
 
         //get only buyers
-        app.get('/dashboard/allbuyers', async (req, res) => {
+        app.get('/dashboard/allbuyers', verifyJWT, async (req, res) => {
 
             const query = {};
             const users = await usersCollection.find(query).toArray();
@@ -336,7 +312,7 @@ async function run() {
 
 
         //make advertise
-        app.get('/makeadd', async (req, res) => {
+        app.get('/makeadd', verifyJWT, async (req, res) => {
             const query = {};
             const result = await addCollection.find(query).toArray()
             res.send(result);
