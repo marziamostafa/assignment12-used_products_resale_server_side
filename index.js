@@ -199,12 +199,12 @@ async function run() {
 
 
 
-        app.get('/users', verifyJWT, async (req, res) => {
+        app.get('/users', async (req, res) => {
             const email = req.query.email
-            const decodedEmail = req.decoded.email
-            if (email !== decodedEmail) {
-                return res.status(403).send({ message: 'forbidden access' })
-            }
+            // const decodedEmail = req.decoded.email
+            // if(email !== decodedEmail){
+            //     return res.status(403).send({message: 'forbidden access'})
+            // }
             const query = { email: email };
             // console.log(req.headers.authorization)
             const result = await usersCollection.find(query).toArray()
@@ -254,7 +254,7 @@ async function run() {
 
 
         //get only buyers
-        app.get('/dashboard/allbuyers', verifyJWT, async (req, res) => {
+        app.get('/dashboard/allbuyers', async (req, res) => {
 
             const query = {};
             const users = await usersCollection.find(query).toArray();
@@ -312,7 +312,7 @@ async function run() {
 
 
         //make advertise
-        app.get('/makeadd', verifyJWT, async (req, res) => {
+        app.get('/makeadd', async (req, res) => {
             const query = {};
             const result = await addCollection.find(query).toArray()
             res.send(result);
